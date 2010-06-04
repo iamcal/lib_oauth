@@ -15,4 +15,14 @@
 	define('OAUTH_CALLBACK_URL',	'http://127.0.0.1/misc-projects/lib_oauth/test/2_callback.php');
 
 	define('OAUTH_PROTECTED_URL',	'http://api.twitter.com/1/statuses/user_timeline.xml?count=1');
+
+
+	function dump_last_request(){
+
+		echo "<div style=\"background-color: #fee; border: 4px solid #900; padding: 1em; margin: 1em 0;\">";
+		echo "Last HTTP Request:";
+		echo "<pre>".htmlspecialchars(var_export($GLOBALS[oauth_last_request],1))."</pre>";
+		echo "</div>";
+		exit;
+	}
 ?>

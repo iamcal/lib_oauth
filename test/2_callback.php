@@ -25,10 +25,7 @@
 	if (!$ok){
 
 		echo "Something didn't work!<hr />";
-
-		echo "<pre>";
-		echo HtmlSpecialChars(print_r($keys, 1));
-		echo "</pre>";
+		dump_last_request();
 		exit;
 	}
 

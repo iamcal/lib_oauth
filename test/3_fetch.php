@@ -17,6 +17,8 @@
 	#
 
 	$ret = oauth_request($keys, OAUTH_PROTECTED_URL);
+	if (!strlen($ret)) dump_last_request();
+
 ?>
 
 <p>Looks like it worked. We asked for your latest tweet and we got:</p>
@@ -26,4 +28,6 @@
 </div>
 
 
-<p>Refreshing this page will re-request these protected resources. To test again, <a href="1_start.php">start over</a></p>
+<p>Refreshing this page will re-request these protected resources.</p>
+<p>To test authenticated HTTP POSTs, <a href="4_post.php">click here</a>.</p>
+<p>To test again, <a href="1_start.php">start over</a></p>

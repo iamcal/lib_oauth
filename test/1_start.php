@@ -24,6 +24,6 @@
 		echo "access url is <a href=\"$url\">$url</a>\n";
 		exit;
 	}else{
-		die("something went wrong");
+		dump_last_request();
 	}
 ?>
