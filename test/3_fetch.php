@@ -29,5 +29,5 @@
 
 
 <p>Refreshing this page will re-request these protected resources.</p>
-<p>To test authenticated HTTP POSTs, <a href="4_post.php">click here</a>.</p>
+<p>To test authenticated HTTP POSTs, <a href="4_post.php">click here</a> (requires cURL and JSON extensions to test).</p>
 <p>To test again, <a href="1_start.php">start over</a></p>
