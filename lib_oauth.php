@@ -17,6 +17,9 @@
 	#  * Zhihong Zhang <zhihong.zhang@corp.aol.com>
 	#    - quoted key names for E_WARNINGS mode
 	#    - caught the urlencode() vs rawurlencode() bug
+	#  * Paul Webster <paul@dabdig.com>
+	#    - POST support
+	#    - cURL support
 	#
 	# This program is free software; you can redistribute it and/or modify
 	# it under the terms of the GNU General Public License as published by
@@ -32,6 +35,29 @@
 	# along with this program; if not, write to the Free Software
 	# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	#
+
+	################################################################################################
+
+	#
+	# use fopen wrappers for GETs - this will usually work on servers
+	# that don't have cURL installed, but wont work for POST requests
+	#
+
+	$GLOBALS[oauth_use_fopen_wrappers] = false;
+
+
+	#
+	# seconds before HTTP requests time out (cURL only)
+	#
+
+	$GLOBALS[oauth_http_timeout] = 2;
+
+
+	#
+	# this gets filled after each HTTP request
+	#
+
+	$GLOBALS[oauth_last_request] = array();
 
 	################################################################################################
 
@@ -85,7 +111,13 @@
 
 		$url = oauth_sign_get($key_bucket, $url, $params, $method);
 
-		return implode("", file($url));
+		if ($method == 'POST'){
+			list($url, $postdata) = explode('?', $url, 2);
+		}else{
+			$postdata = null;
+		}
+
+		return oauth_http_request($url, $method, $postdata);
 	}
 
 	################################################################################################	
@@ -192,9 +224,9 @@
 
 	################################################################################################	
 
-	function oauth_get_auth_token(&$key_bucket, $url, $params=array(), $method="GET"){
+	function oauth_get_auth_token(&$key_bucket, $url, $params=array()){
 
-		$url = oauth_sign_get($key_bucket, $url, $params, $method);
+		$url = oauth_sign_get($key_bucket, $url, $params);
 		$bits = oauth_url_to_hash($url);
 
 		$key_bucket['request_key']	= $bits['oauth_token'];
@@ -211,7 +243,7 @@
 
 	function oauth_url_to_hash($url){
 
-		$crap = implode("\n", file($url));
+		$crap = oauth_http_request($url);
 		$bits = explode("&", $crap);
 
 		$out = array();
@@ -232,12 +264,12 @@
 
 	################################################################################################
 
-	function oauth_get_access_token(&$key_bucket, $url, $params=array(), $method="GET"){
+	function oauth_get_access_token(&$key_bucket, $url, $params=array()){
 
 		$key_bucket['user_key']		= $key_bucket['request_key'];
 		$key_bucket['user_secret']	= $key_bucket['request_secret'];
 
-		$url = oauth_sign_get($key_bucket, $url, $params, $method);
+		$url = oauth_sign_get($key_bucket, $url, $params);
 		$bits = oauth_url_to_hash($url);
 
 		$key_bucket['user_key']		= $bits['oauth_token'];
@@ -250,5 +282,74 @@
 		return 0;
 	}
 
+	################################################################################################
+	
+	function oauth_http_request($url, $method="GET", $postdata=null){
+
+		#
+		# use fopen wrappers?
+		#
+
+		if ($GLOBALS[oauth_use_fopen_wrappers] && $method == 'GET'){
+
+			$response = implode("", file($url));
+
+			$GLOBALS[oauth_last_request] = array(
+				'request'	=> array(
+					'url'		=> $url,
+					'method'	=> $method,
+				),
+				'body'		=> $response,
+			);
+
+			return $response;
+		}
+
+
+		#
+		# use curl
+		#
+
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 	// Get around error 417
+		curl_setopt($ch, CURLOPT_HEADER, FALSE);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_TIMEOUT, $GLOBALS[oauth_http_timeout]);
+
+		if ($method == 'GET'){
+			# nothing special for GETs
+		}else if ($method == 'POST'){
+			curl_setopt($ch, CURLOPT_POST, TRUE);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
+		}else{
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+		}
+		
+		$response = curl_exec($ch);
+		$headers = curl_getinfo($ch);
+
+		curl_close($ch);
+
+		$GLOBALS[oauth_last_request] = array(
+			'request'	=> array(
+				'url'		=> $url,
+				'method'	=> $method,
+				'postdata'	=> $postdata,
+			),
+			'headers'	=> $headers,
+			'body'		=> $response,
+		);
+
+	        if ($headers['http_code'] != "200"){
+
+			return '';
+		}
+
+		return $response;
+	}
+	
 	################################################################################################
 ?>
