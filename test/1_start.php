@@ -1,6 +1,6 @@
 <?
 	include('../lib_oauth.php');
-
+	include('config.php');
 
 	##########################################################################################
 	#
@@ -8,15 +8,15 @@
 	#
 
 	$keys = array(
-		'oauth_key'		=> 'GtAR0u9QLjNr',
-		'oauth_secret'		=> '4M2PpvmhcMyfXybsacaed9CjKyoTQpMN',
+		'oauth_key'		=> OAUTH_CONSUMER_KEY,
+		'oauth_secret'		=> OAUTH_CONSUMER_SECRET,
 	);
 
-	$ok = oauth_get_auth_token($keys, "https://fireeagle.yahooapis.com/oauth/request_token");
+	$ok = oauth_get_auth_token($keys, OAUTH_REQUEST_URL, array( 'oauth_callback' => OAUTH_CALLBACK_URL ));
 
 	if ($ok){
 
-		$url = oauth_get_auth_url($keys, "https://fireeagle.yahoo.net/oauth/authorize");
+		$url = oauth_get_auth_url($keys, OAUTH_AUTHORIZE_URL);
 
 		setcookie('my_req_key',		$keys[request_key]);
 		setcookie('my_req_secret',	$keys[request_secret]);
