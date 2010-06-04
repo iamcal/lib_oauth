@@ -70,9 +70,9 @@
 
 	################################################################################################
 
-	function oauth_sign_get($key_bucket, $url, $params=array()){
+	function oauth_sign_get($key_bucket, $url, $params=array(), $method="GET"){
 
-		$params = oauth_sign($key_bucket, $url, $params, 'GET');
+		$params = oauth_sign($key_bucket, $url, $params, $method);
 
 		$url = oauth_normalize_http_url($url) . "?" . oauth_to_postdata($params);
 
@@ -192,9 +192,9 @@
 
 	################################################################################################	
 
-	function oauth_get_auth_token(&$key_bucket, $url, $params=array()){
+	function oauth_get_auth_token(&$key_bucket, $url, $params=array(), $method="GET"){
 
-		$url = oauth_sign_get($key_bucket, $url, $params);
+		$url = oauth_sign_get($key_bucket, $url, $params, $method);
 		$bits = oauth_url_to_hash($url);
 
 		$key_bucket['request_key']	= $bits['oauth_token'];
@@ -232,12 +232,12 @@
 
 	################################################################################################
 
-	function oauth_get_access_token(&$key_bucket, $url, $params=array()){
+	function oauth_get_access_token(&$key_bucket, $url, $params=array(), $method="GET"){
 
 		$key_bucket['user_key']		= $key_bucket['request_key'];
 		$key_bucket['user_secret']	= $key_bucket['request_secret'];
 
-		$url = oauth_sign_get($key_bucket, $url, $params);
+		$url = oauth_sign_get($key_bucket, $url, $params, $method);
 		$bits = oauth_url_to_hash($url);
 
 		$key_bucket['user_key']		= $bits['oauth_token'];
