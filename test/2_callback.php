@@ -32,19 +32,8 @@
 		exit;
 	}
 
+	setcookie('my_acc_key',		$keys[user_key]);
+	setcookie('my_acc_secret',	$keys[user_secret]);
 
-	##########################################################################################
-	#
-	# STEP 3 - access the protected resource
-	#
-
-	$ret = oauth_request($keys, OAUTH_PROTECTED_URL);
-
-	echo "Looks like it worked. We asked for your latest tweet and we got:<hr />";
-
-	echo "<pre>";
-	echo HtmlSpecialChars($ret);
-	echo "</pre>";
-
-	echo "Refreshing this page <i>will fail</i>, since request tokens only work once. To test again, <a href=\"1_start.php\">start over</a>";
+	header('location: 3_fetch.php');
 ?>
