@@ -43,21 +43,21 @@
 	# that don't have cURL installed, but wont work for POST requests
 	#
 
-	$GLOBALS[oauth_use_fopen_wrappers] = false;
+	$GLOBALS['oauth_use_fopen_wrappers'] = false;
 
 
 	#
 	# seconds before HTTP requests time out (cURL only)
 	#
 
-	$GLOBALS[oauth_http_timeout] = 2;
+	$GLOBALS['oauth_http_timeout'] = 2;
 
 
 	#
 	# this gets filled after each HTTP request
 	#
 
-	$GLOBALS[oauth_last_request] = array();
+	$GLOBALS['oauth_last_request'] = array();
 
 	################################################################################################
 
@@ -68,7 +68,7 @@
 		#
 
 		$url_parsed = parse_url($url);
-		if ($url_parsed['query']){
+		if (isset($url_parsed['query'])){
 			parse_str($url_parsed['query'], $url_params);
 			$params = array_merge($params, $url_params);
 		}
@@ -290,11 +290,11 @@
 		# use fopen wrappers?
 		#
 
-		if ($GLOBALS[oauth_use_fopen_wrappers] && $method == 'GET'){
+		if ($GLOBALS['oauth_use_fopen_wrappers'] && $method == 'GET'){
 
 			$response = implode("", file($url));
 
-			$GLOBALS[oauth_last_request] = array(
+			$GLOBALS['oauth_last_request'] = array(
 				'request'	=> array(
 					'url'		=> $url,
 					'method'	=> $method,
@@ -317,7 +317,7 @@
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 	// Get around error 417
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_TIMEOUT, $GLOBALS[oauth_http_timeout]);
+		curl_setopt($ch, CURLOPT_TIMEOUT, $GLOBALS['oauth_http_timeout']);
 
 		if ($method == 'GET'){
 			# nothing special for GETs
@@ -333,7 +333,7 @@
 
 		curl_close($ch);
 
-		$GLOBALS[oauth_last_request] = array(
+		$GLOBALS['oauth_last_request'] = array(
 			'request'	=> array(
 				'url'		=> $url,
 				'method'	=> $method,
