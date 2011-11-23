@@ -151,7 +151,14 @@
 		if (array_key_exists('port', $parts) && $parts['port'] != '80'){
 			$port = ':' . $parts['port'];
 		}
-		return "{$parts['scheme']}://{$parts['host']}{$port}{$parts['path']}"; 
+
+		$url = "{$parts['scheme']}://{$parts['host']}{$port}{$parts['path']}"; 
+
+		if ($path['fragments']){
+			$url .= "#{$part['fragment']}";
+		}
+
+		return $url;
 	}
 
 	################################################################################################	
