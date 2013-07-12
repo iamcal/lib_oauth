@@ -1,8 +1,4 @@
-<?
-	#
-	# $Id$
-	#
-
+<?php
 	#
 	# lib_oauth - A standalone PHP4 OAuth library
 	#
@@ -122,18 +118,24 @@
 
 	################################################################################################	
 
+	function oauth_encode($str){
+		return str_replace('/%7E/', '~', rawurlencode($str));
+	}
+
+	################################################################################################	
+
 	function oauth_build_signature($key_bucket, $url, $params, $method){
 
 		$sig = array(
-			rawurlencode(StrToUpper($method)),
-			preg_replace('/%7E/', '~', rawurlencode(oauth_normalize_http_url($url))),
-			rawurlencode(oauth_get_signable_parameters($params)),
+			oauth_encode(StrToUpper($method)),
+			oauth_encode(oauth_normalize_http_url($url)),
+			oauth_encode(oauth_get_signable_parameters($params)),
 		);
 
-		$key = rawurlencode($key_bucket['oauth_secret']) . "&";
+		$key = oauth_encode($key_bucket['oauth_secret']) . "&";
 
 		if (isset($key_bucket['user_key'])){
-			$key .= rawurlencode($key_bucket['user_secret']);
+			$key .= oauth_encode($key_bucket['user_secret']);
 		}
 
 		$raw = implode("&", $sig);
@@ -170,7 +172,7 @@
 		$total = array();
 		foreach ($sorted as $k => $v) {
 			if ($k == "oauth_signature") continue;
-			$total[] = rawurlencode($k) . "=" . rawurlencode($v);
+			$total[] = oauth_encode($k) . "=" . oauth_encode($v);
 		}
 		return implode("&", $total);
 	}
@@ -180,7 +182,7 @@
 	function oauth_to_postdata($params){
 		$total = array();
 		foreach ($params as $k => $v) {
-			$total[] = rawurlencode($k) . "=" . rawurlencode($v);
+			$total[] = oauth_encode($k) . "=" . oauth_encode($v);
 		}
 		$out = implode("&", $total);
 		return $out;
