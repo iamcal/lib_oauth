@@ -156,8 +156,8 @@
 
 		$url = "{$parts['scheme']}://{$parts['host']}{$port}{$parts['path']}"; 
 
-		if (strlen($path['fragments'])){
-			$url .= "#{$part['fragment']}";
+		if (isset($parts['fragments']) && strlen($parts['fragments'])){
+			$url .= "#{$parts['fragment']}";
 		}
 
 		return $url;
